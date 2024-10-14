@@ -28,6 +28,11 @@
             box-sizing: border-box;
         }
 
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
         label {
             display: block;
             margin-bottom: 10px;
@@ -108,7 +113,7 @@
 
         <!-- File Upload Section -->
         <label for="file-upload">Upload File</label>
-        <input type="file" id="file-upload" accept=".txt,.json,.botframe" aria-label="Upload your file">
+        <input type="file" id="file-upload" aria-label="Upload your file">
 
         <!-- From Selector -->
         <label for="select-from">From</label>
@@ -175,16 +180,36 @@
             const textarea = document.getElementById('textarea');
 
             let uploadedFileContent = '';
+            let uploadedFileName = '';
 
             // Handle File Upload
             fileUpload.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
+                    uploadedFileName = file.name;
                     const reader = new FileReader();
+
                     reader.onload = function(e) {
-                        uploadedFileContent = e.target.result;
-                        textarea.value = uploadedFileContent;
+                        // Determine the file type based on the extension
+                        const fileExtension = uploadedFileName.split('.').pop().toLowerCase();
+
+                        // Simple handling based on file extension
+                        // You can expand this to handle more file types as needed
+                        if (fileExtension === 'txt' || fileExtension === 'json' || fileExtension === 'botframe') {
+                            uploadedFileContent = e.target.result;
+                            textarea.value = uploadedFileContent;
+                        } else {
+                            // For other file types, display as binary or provide a message
+                            // Here, we'll just indicate that the file has been uploaded
+                            uploadedFileContent = e.target.result;
+                            textarea.value = `File "${uploadedFileName}" has been uploaded. Please proceed with conversion if supported.`;
+                        }
                     };
+
+                    reader.onerror = function() {
+                        alert('Failed to read file. Please try again.');
+                    };
+
                     reader.readAsText(file);
                 }
             });
@@ -202,7 +227,18 @@
 
                 // Placeholder for conversion logic
                 // You need to implement the actual conversion based on your requirements
-                let convertedContent = `Converted from ${fromFormat} to ${toFormat}.\nClean Replay: ${cleanReplay}\n\n${uploadedFileContent}`;
+                let convertedContent;
+
+                // Example: Simple conversion message
+                convertedContent = `Converted from ${fromFormat} to ${toFormat}.\nClean Replay: ${cleanReplay}\n\n`;
+
+                // Append content based on file type
+                const fileExtension = uploadedFileName.split('.').pop().toLowerCase();
+                if (fileExtension === 'txt' || fileExtension === 'json' || fileExtension === 'botframe') {
+                    convertedContent += uploadedFileContent;
+                } else {
+                    convertedContent += `Binary or unsupported file content cannot be displayed.`;
+                }
 
                 // Display the converted content
                 textarea.value = convertedContent;
