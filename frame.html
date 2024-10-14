@@ -9,12 +9,12 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         .container {
@@ -25,23 +25,27 @@
             text-align: center;
             max-width: 500px;
             width: 100%;
+            box-sizing: border-box;
         }
 
         label {
             display: block;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-size: 16px;
             color: #555;
             text-align: left;
         }
 
-        select {
+        select,
+        input[type="file"],
+        textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
             margin-bottom: 20px;
+            box-sizing: border-box;
         }
 
         button {
@@ -67,15 +71,50 @@
             color: #888;
             margin-top: 20px;
         }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            select,
+            input[type="file"],
+            textarea {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+
+        /* Enhanced Touch Targets for Mobile */
+        button {
+            touch-action: manipulation;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <h2>Converter</h2>
+
+        <!-- File Upload Section -->
+        <label for="file-upload">Upload File</label>
+        <input type="file" id="file-upload" accept=".txt,.json,.botframe" aria-label="Upload your file">
+
+        <!-- From Selector -->
         <label for="select-from">From</label>
-        <select id="select-from">
+        <select id="select-from" aria-label="Select source format">
             <option value="txt">Plain Text</option>
-            <option selected="selected" value="zbf">zBot Frame</option>
+            <option selected value="zbf">zBot Frame</option>
             <option value="xbot-frame">xBot Frame</option>
             <option value="replaybot">ReplayBot</option>
             <option value="tasbot-f">TASBOT</option>
@@ -87,11 +126,10 @@
             <option value="mhrjson">MHR Json</option>
         </select>
 
-        <br>
-
+        <!-- To Selector -->
         <label for="select-to">To</label>
-        <select id="select-to">
-            <option selected="selected" value="txt">Plain Text</option>
+        <select id="select-to" aria-label="Select target format">
+            <option selected value="txt">Plain Text</option>
             <option value="zbf">zBot Frame</option>
             <option value="xbot-frame">xBot Frame</option>
             <option value="replaybotf">ReplayBot</option>
@@ -104,15 +142,13 @@
             <option value="mhrjson">MHR Json</option>
         </select>
 
-        <br>
-
-        <label>
+        <!-- Checkbox Option -->
+        <label for="chk-clean">
             <input type="checkbox" id="chk-clean" checked>
             Clean replay (removes redundant actions)
         </label>
 
-        <br>
-
+        <!-- Action Buttons -->
         <button id="btn-convert">Convert</button>
         <button id="btn-offset-frames">Offset Frames</button>
         <button id="btn-remove-p1">Remove all Player 1 inputs</button>
@@ -120,15 +156,68 @@
         <button id="btn-flip-hold">Flip hold ⟷ release</button>
         <button id="btn-flip-player">Flip player 1 ⟷ player 2</button>
         <button id="btn-sort-inputs">Sort inputs by frame</button>
-        <p class="footer-text">Ui Made by speedyfriend67</p>
 
-        <br>
-        <textarea id="textarea" cols="40" rows="10" disabled></textarea>
+        <!-- Output Textarea -->
+        <textarea id="textarea" rows="10" placeholder="Converted output will appear here..." readonly></textarea>
+
+        <!-- Footer -->
+        <p class="footer-text">UI Made by speedyfriend67</p>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
-    <script src="./main.js"></script>
+    <!-- Font Awesome for Icons (optional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" integrity="sha512-dBw5HQPeBxN9mP4YvWvJJ/6GJbB7rE6nfw6YpZbT5mtBfYQ2kYlG6SPu6dVZ5xGvYq3J0+1AQvq6B6Y4rMkzWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Main JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileUpload = document.getElementById('file-upload');
+            const btnConvert = document.getElementById('btn-convert');
+            const textarea = document.getElementById('textarea');
+
+            let uploadedFileContent = '';
+
+            // Handle File Upload
+            fileUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedFileContent = e.target.result;
+                        textarea.value = uploadedFileContent;
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            // Handle Convert Button Click
+            btnConvert.addEventListener('click', () => {
+                const fromFormat = document.getElementById('select-from').value;
+                const toFormat = document.getElementById('select-to').value;
+                const cleanReplay = document.getElementById('chk-clean').checked;
+
+                if (!uploadedFileContent) {
+                    alert('Please upload a file first.');
+                    return;
+                }
+
+                // Placeholder for conversion logic
+                // You need to implement the actual conversion based on your requirements
+                let convertedContent = `Converted from ${fromFormat} to ${toFormat}.\nClean Replay: ${cleanReplay}\n\n${uploadedFileContent}`;
+
+                // Display the converted content
+                textarea.value = convertedContent;
+            });
+
+            // Additional button functionalities can be implemented similarly
+            // Placeholder implementations:
+            const buttons = ['btn-offset-frames', 'btn-remove-p1', 'btn-remove-p2', 'btn-flip-hold', 'btn-flip-player', 'btn-sort-inputs'];
+            buttons.forEach(id => {
+                document.getElementById(id).addEventListener('click', () => {
+                    alert(`Functionality for ${id.replace('btn-', '').replace(/-/g, ' ')} is not implemented yet.`);
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
-
